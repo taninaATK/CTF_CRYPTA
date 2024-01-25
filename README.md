@@ -1,3 +1,5 @@
+******** CURRENTLY STILL WORKING ON IT, I HAVE 12 FLAGS AT THE MOMENT ********
+
 CTF at : https://crypta.sfpn.net/
 
 This CTF challenge was mandatory as a part of the andvanced cryptography course of my master (2nd year).
