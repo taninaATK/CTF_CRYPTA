@@ -1,0 +1,26 @@
+ ihm.look : () -> tuple
+Simule vos yeux.  Renvoie (description, liste des objets)
+
+- ihm.think : (what: str) -> None
+Simule votre propre pensée.
+
+- server.history : () -> list
+Renvoie une liste de chaines de caractères (une par commit)
+
+- server.sessions : () -> list
+Renvoie (session, IP, username, start, end, location) pour chaque session sur le serveur
+
+- server.status : () -> dict
+Renvoie un objet avec des informations inutiles sur le serveur
+
+- service.echo : (**kwds: Any) -> Any
+Renvoie les arguments fournis.
+
+- service.extra_free_point : (magic_string: str) -> str
+Utiliser ce service rapporte un point supplémentaire, si vous fournissez la chaîne magique.
+
+- service.free_point : (questcequondit: str) -> str
+Utiliser ce service rapporte un point, si vous demandez poliment.
+
+- service.list : () -> list
+Renvoie une liste de paires (method, description).

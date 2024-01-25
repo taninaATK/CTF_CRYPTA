@@ -1,0 +1,18 @@
+Subject: Re: Évacuation
+To: Yanny Dicot <yanny.dicot@ufr-info-p6.jussieu.fr>
+From: Mohab Safey El Din <mohab.safey@lip6.fr>
+Message-ID: <20210907074035.GI3127@lip6.fr>
+Date: Tue, 7 Sep 2021 10:17:06 +0200
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Antivirus-Status: Clean
+User-Agent: BuggyMailClient/1.3.13
+X-Signature-Algorithm: SDSA
+X-Hash-Algorithm: SHA256
+X-Hash: 33ff00adea747e56b4f9c5aba348f6ad8cc90f19af04cdde2af2164822d40390
+X-Signature: 3045022100EF08400BE9B08CF288B03AF8601E1FA0A73B3A3C0BE48F7D2396FC560AEE1F09022061471349DCFE0417279B1D9683C1EB3175FFBF2B74EB928F27A6F27F14B4B845
+
+PS : a-t-on beaucoup de pertes parmi les étudiants ?
+---
+Mohab

@@ -1,0 +1,59 @@
+Borne d'arcade ``Pierre-Feuille-Ciseau''
+----------------------------------------
+
+Ces bornes d'arcade high-tech permettent d'évacuer le stress des études en
+jouant de façon équitable contre des intelligences artificielles surentraînées,
+capable d'humilier les meilleurs joueurs humains (une séries d'études
+complémentaires cherche à établir une correlation entre la baisse du niveau de
+stress et l'écrasement de l'égo des participants).
+
+La partie se déroule en plusieurs manches.  Le gagnant de chaque manche marque
+un point.  Le premier qui atteint 32 points a gagné.  Dans une manche, chaque
+joueur choisit un coup (PIERRE, FEUILLE ou CISEAUX).  Celui qui a le meilleur
+coup gagne la manche :
+- PIERRE  bat CISEAUX
+- CISEAUX bat FEUILLE
+- FEUILLE bat PIERRE
+
+Lorsque le numéro de la manche est pair, le joueur commence.  Sinon, c'est
+l'adversaire qui commence.  Celui qui commence transmet une MISE EN GAGE de son
+coup.  L'autre transmet son coup directement.  Celui qui a commencé OUVRE alors
+sa mise en gage.
+
+Un ARBITRE veille au bon déroulement de la partie.  Chaque joueur peut saisir
+l'arbitre en cas de triche averée de la part de l'autre.  Les tricheurs
+subissent une pénalité de 3 points.  Accuser l'autre de triche de manière
+infondée entraîne aussi une pénalité de 3 points.
+
+Un COMMENTATEUR annonce l'issue de chaque manche et les scores actuels.
+
+Le jeu suit un protocole simple : le joueur et l'adversaire échangent des 
+COMMANDES en mode texte.  Une commande commence par un VERBE suivi par un nombre
+variable d'ARGUMENTS (potentiellement zéros).  Les arguments, lorsque ce sont 
+des entiers, doivent être en hexadécimal.  Chaque joueur possède un GROUPE 
+d'entiers modulo p, fixé au début de la partie.  Si aucun groupe n'est spécifié,
+c'est le ``OAKLEY group 14'' (cf. https://www.ietf.org/rfc/rfc3526.txt) qui est
+utilisé.  La mise en gage utilise le chiffrement Elgamal.
+
+Les verbes reconnus sont :
+- GROUP p g q                   # sélectionne le groupe {g**i mod p: 0 <= i < q}
+- PKEY h                             # déclare une clef publique h == g**x mod p
+- COMMIT r c                         # (r, c) est le chiffrement Elgamal du coup
+- MOVE m                                                       # annonce le coup
+- OPEN k                            # révèle l'aléa utilisé dans la mise en gage
+- REFEREE                                    # saisis l'arbitre en cas de triche
+- OK                                             # approuve l'issue de la manche
+
+Le joueur et l'adversaire DOIVENT déclarer leurs clefs publiques dans le 
+prologue, avant le début de la première manche.  Ils PEUVENT déclarer un groupe
+alternatif.  Une manche se déroule de la façon suivante.  Si c'est le tour du
+joueur, il doit envoyer (dans l'ordre) les commandes : 
+- COMMIT
+- MOVE
+- OPEN
+
+Si ce n'est pas son tour, alors il doit envoyer les commandes :
+- MOVE
+- OK | REFEREE
+
+Au niveau de difficulté ``Nightmare'', le verbe GROUP est désactivé.

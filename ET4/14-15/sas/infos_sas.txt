@@ -1,0 +1,99 @@
+Vous êtes dans la salle serveur de la PPTI...  ou plutôt, vous êtes devant
+le sas du couloir froid qui contient les racks de serveurs de la PPTI.  
+Il y a un lecteur de badge à côté de la porte.  Au mur une affiche indique : 
+  +---------------------------------------------------------------------+
+  |          ACCÈS AUX SERVEURS :                                       |
+  |                                                                     |
+  |  Votre badge de service doit contenir une signature qui prouve vos  |
+  |  droit d'accès.  Elle doit avoir l'ID ``ppti_server_room''.         |
+  |                                                                     |
+  |  Il doit s'agir d'une signature de la chaine :                      |
+  |          "PPTI SERVER ACCESS ON yyyy-mm-dd hh:mm UTC"               |
+  |  (en remplaçant yyyy par l'année, mm par le mois, dd par le jour    |
+  |   du mois, hh par l'heure et mm par les minutes).                   |
+  |                                                                     |
+  |  La signature doit vérifier correctement avec la clef de la PPTI.   |
+  |  Elle doit obéir à la norme RSA / PKCS#1 v1.5.                      |
+  |                                                                     |
+  |  Attention, la date doit être en temps universel (cf.  horloge).    |
+  |                                                                     |
+  |  *** Le responsable                                                 |
+  +---------------------------------------------------------------------+
+
+Vu comment le problème est posé, il faut pouvoir forger une signature en moins
+d'une minute (ou bien anticiper...).  Heureusement, c'est complètement possible
+dans ce cas précis.
+
+En temps normal, une signature S est considérée comme valide pour le bourrage
+PKCS#1 v1.5 si (S**e % N) possède la structure :
++------+----------------------------------------------------+----+---------+---+
+| 0001 | FFFFFFFFFFF............................FFFFFFFFFFF | 00 | HASH_ID | H |
++------+----------------------------------------------------+----+---------+---+
+où H est l'empreinte (SHA-256) du message signé.
+
+Le code qui vérifie les signatures (il est dans la bibliothèque) a un gros bug.
+Ce bug, combiné avec le fait que e==3 dans la clef de la PPTI, permet de forger
+des signatures efficacement.
+L'effet du bug est le suivant : une signature S sera considérée comme valide si
+(S**e % N) possède la structure :
++------+------------------+----+---------+---+---------------------------------+
+| 0001 | FFFFFFFFFFFFFFFF | 00 | HASH_ID | H | JUUUUUUUUUUUUUUUNNNNNNNNNNNNNNK |
++------+------------------+----+---------+---+---------------------------------+
+où le <junk> peut être arbitraire et où H est l'empreinte du message signé avec
+SHA-256. La taille du préfixe forcé est de 62 octets, en principe.  Le <junk>
+peut donc occuper 194 octets, si la clef fait 2048 bits.  Si on essaye de forger
+une signature pour un message quelconque, alors H nous est imposé par le message.
+Y parvenir revient à trouver un entier X tel que X**3 % N ait cette structure.
+Là où le bug nous simplifie la vie, c'est qu'on est libre de choisir le <junk>.
+
+L'idée générale est simple : on ne sait pas calculer les racines cubiques modulo
+N, lorsque la factorisation de N est inconnue (ça c'est ce que peut faire le
+possesseur de la clef secrète).  Cependant, on sait le faire sur les vrais entiers
+(pas modulo).  Par conséquent, pour forger une signature, on adopte la stratégie
+suivante : on cherche un PETIT entier X de 682 bits (c'est 2048/3), tel que
+X**3 ait la structure ci-dessus (sans modulo).  Comme X est petit, le modulo
+n'entre pas en jeu lorsqu'on l'élève au cube et X**3 % N a automatiquement la
+bonne forme.  Autrement dit, X est la racine cubique sur les vrais entiers de la
+structure ci-dessus.
+
+Pour trouver cet entier X, il ``suffit'' de choisir une bonne valeur de <junk>,
+rajouter le préfixe forcé correspondant à H et au padding PKCS#1, ce qui donne
+un entier qu'on note PAD(<junk>), puis en calculer la racine cubique.  La logique
+voudrait que CUBE_ROOT(x)**3 == x pour tout x.  Du coup, on pourrait imaginer que
+CUBE_ROOT(PAD(<junk>))**3 == PAD(<junk>), et donc qu'on ait une signature valide.
+
+Le problème, c'est qu'il n'y a aucune raison a priori que la racine cubique de
+PAD(junk) soit un entier.  Par exemple, CUBE_ROOT(100) == 4.64... Or, nous devons
+fournir un entier, donc il va y avoir un arrondi.  Si on retire les décimales, on
+diminue la valeur : CUBE_ROOT(100) = 4.xxxxx, mais 4**3 == 64 (et pas 100).
+Quand on va re-élever au cube, on va ainsi toujours obtenir quelque chose de plus
+petit que ce qu'on voudrait.
+
+Heureusement, nous avons la possibilité de choisir le <junk> à notre guise.
+Choisissons <junk> de telle sorte que N(<junk>) soit le plus grand possible :
+
+        <junk> = 0xFFFFFF.......FFFFFF.
+
+Alors, PAD(<junk>) aura la forme :
++------+--------------------+---------+---+----------------------------------+
+| 0001 | FFFFFFFFFFFFFFFF00 | HASH_ID | H | FFFFFFFFFFF..........FFFFFFFFFFF |
++------+--------------------+---------+---+----------------------------------+
+
+Calculons sa racine cubique entière X, puis re-élevons X au cube.  On obtient un
+entier inférieur à PAD(<junk>).
+
+Si cet entier X**3 est plus grand que :
++------+--------------------+---------+---+----------------------------------+
+| 0001 | FFFFFFFFFFFFFFFF00 | HASH_ID | H | 00000000000..........00000000000 |
++------+--------------------+---------+---+----------------------------------+
+Alors c'est gagné, car X va être considéré comme une signature valide vu que le
+<junk> est ignoré.  En pratique, vu les tailles choisies, ça va marcher à tous
+les coups.
+
+Calculer la racine cubique sur des entiers de cette taille nécessite un algo
+adapté.  En particulier, on ne peut PAS convertir en flottant, calculer la racine
+cubique sur les flottants, puis re-convertir en entier : les flottants sont trop
+peu précis pour que ça marche.  À la place, on peut utiliser la méthode de Newton
+(cf. Wikipédia) pour le calcul des racines n-ièmes, en effectuant les opérations
+sur les entiers.
+

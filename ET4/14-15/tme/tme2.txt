@@ -1,0 +1,29 @@
+https://doc.sagemath.org/html/en/reference/modules/sage/modules/free_module_integer.html#sage.modules.free_module_integer.FreeModule_submodule_with_basis_integer.shortest_vector
+
+Difficulté : **
+
+
+But     : écrire un entier x sous la forme x == a / b (modulo p)
+          avec |a| <= sqrt(p) et |b| <= sqrt(p).
+
+p = cf517941a770d0b8270a7a0464c0ea9e50410c6ac1cc9e3a69b663e4eb3ec413a42b4059cfd029f0f846d33882715510b18f4ddf8f9521cb0bec9ec794a0bad08959feafd53a8d21736e1abdfb579a3f85c4bca955926e378d574d967c80c9e7d985f53064f3070a38ee741f04e665e49e26a44d737cc7d922507b0545912505
+
+x = 7c13d6444bf9d1e0454d9b3a1b7060254601b60c14defb40bc814cfe5e20de99761fa9fe08f83110e8c21d38536f639d5b984e6e12d1ed1a10da9dcd09280367744ca1333c3f6f8ba0610ebe4e0c8551f25d081fe9395671cd6be535bb43a9441f732c29fa4823b2fafed61b72d7cb513e22feb1017d0a910f96789f499b190e
+
+
+
+############ CONSEILS ##############
+
+x = beta
+
+Si x == a / b mod p, alors x * b == a mod p.  Il suffit de trouver une solution
+telle que |a| et |b| soient petits tous les deux.
+
+Si x * b == a mod p, alors il existe un entier k tel que x * b == a + k * p.
+On a donc :  * M == (a, b), où M est la matrice
+          [p, 0]
+(-k, b) * [x, 1] == (a, b).
+Il en découle que (a, b) est un vecteur court dans le réseau engendré par les
+lignes de la matrice en question.
+
+Trouver le vecteur le plus court d'un réseau de dimension deux est facile.

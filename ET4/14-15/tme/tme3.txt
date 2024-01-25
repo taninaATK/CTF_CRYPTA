@@ -1,0 +1,26 @@
+Difficulté : ***
+
+
+But     : écrire un entier p premier (congru à 1 mod 4) comme p == a**2 + b**2.
+
+p = e2b013a88a7c93cb8e49d1b288c5cd5c13e6c8cebc5482003b0ead4508dbefc2a2e6ce44f36050822ffe7a23f338a59ca5c638d307f3e1cb8d129174cfd884d9643044d523959c881a6177bf3fadf6e58bd1c46990fcd21463d541515cf7e92d90d12a8c6828c6de9946db2bb5f5b035de71202c9168bcc28c664ce0b1c0fbd9
+
+Si p == a**2 + b**2, alors en particulier a**2 == -b**2 mod p.  Cette remarque
+n'a pas l'air d'apporter grand-chose, mais en fait elle est utile.  Comme 
+p == 1 mod 4, alors -1 est un carré modulo p (on l'admet).  Il existe donc un
+nombre beta tel que beta**2 == -1 mod p.  Par conséquent, on trouve que
+a**2 == (beta*b)**2 mod p, et donc que a == +/- beta*b mod p, or ceci est une
+équation linéaire, plus simple que le problème de départ.
+
+Calculer beta n'est pas très difficile, mais ce serait un peu trop long à
+expliquer (il faut utiliser l'algorithme de Tonnelli-Shanks).  En pratique,un
+logiciel de calcul formel tel que SageMath peut produire beta sans difficulté.
+
+Toute paire (a, b) qui satisfait a == +/- beta*b mod p est telle que
+a**2 + b**2 == 0 mod p.  Donc si a et b sont assez petits, on va avoir que
+a**2 + b**2 == p (c'est le nombre minimum de multiples de p qui est possible).
+Résoudre le problème revient donc à trouver une solution de a == +/- beta*b mod p
+où |a| et |b| sont petits tous les deux, et ça c'est la même chose que l'autre TME.
+
+a ** 2 == (beta*b) ** 2 mod p
+beta ** 2 == (a/b) ** 2 mod p

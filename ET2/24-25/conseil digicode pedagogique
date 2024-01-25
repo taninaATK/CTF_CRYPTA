@@ -1,0 +1,33 @@
+Il faut donc contrefaire une signature SDSA pour le seul utilisateur dont on
+possède la clef publique.  En plus de sa clef, on possède deux signatures qu'il
+a réalisées avec le BuggyMailClient (r).
+
+La spécification complète de SDSA est disponible dans la bibliothèque.
+
+Pour commencer, il faut réussir à lire les informations importantes dans la clef
+publique et dans les signatures.  Si vous ne savez pas comment faire, alors
+retourner bûcher à la bibliothèque.
+
+L'algorithme SDSA (signature de Schnorr) est sûr.  Pour qu'on puisse s'en sortir,
+il faut qu'on trouve une erreur d'implantation à exploiter.  Et c'est là que le
+BuggyMailClient (r) intervient.  Conçu par les meilleurs ingénieurs de la DSI
+de l'université, il implante l'algorithme de signature... avec un gros bug.  En
+effet, l'erreur critique qu'il contient (qui a déjà existé dans des implantations
+largement déployées de ECDSA, notamment dans les Playstation 3) est simple :
+au lieu de générer un nonce à chaque signature, l'algorithme utilise toujours le
+même !
+
+Concrètement, on a donc deux signatures avec le même k.  Ceci permet de trouver
+la clef secrète en résolvant un système de deux équations à deux inconnues (k et x).
+(attention, ça se passe modulo q bien sûr).
+
+Pour mettre en oeuvre l'attaque, il vaut mieux commencer par s'assurer qu'on a bien
+les données du problème, et commencer par essayer de VÉRIFIER les signatures dont
+on dispose.  Tant que ça rate, c'est qu'on a un problème à résoudre avant de continuer.
+Une fois que c'est réglé, on peut donc vérifier soi-même qu'on produit une signature
+correcte, ce qui est une grosse aide.
+
+Comme dans presque toutes les attaques cryptographiques, il vaut mieux commencer
+par s'exercer sur des exemples où on connaît les valeurs secrètes, ce qui aide
+beaucoup à la mise au point.  Concrètement, on peut fabriquer une paire de clefs
+et deux signatures avec le même k, puis tester son attaque dessus.
