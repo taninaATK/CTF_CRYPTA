@@ -1,4 +1,4 @@
-******** CURRENTLY STILL WORKING ON IT, I HAVE 12 FLAGS AT THE MOMENT ********
+******** Currently working on it, caught 11 out of 20 flags atm ********
 
 CTF at : https://crypta.sfpn.net/
 
